@@ -1,4 +1,4 @@
-# RINHA BACK END C#
+# RINHA BACK-END C#
 
 [https://github.com/zanfranceschi/rinha-de-backend-2023-q3](https://github.com/zanfranceschi/rinha-de-backend-2023-q3)
 

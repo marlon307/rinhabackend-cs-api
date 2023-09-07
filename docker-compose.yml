@@ -11,7 +11,7 @@ services:
       MYSQL_DATABASE: simple_project
     volumes:
       - ./database/db.sql:/docker-entrypoint-initdb.d/db.sql
-      - mysql_data:/var/lib/mysql
+      # - mysql_data:/var/lib/mysql
     ports:
       - "3036:3306"
 
@@ -22,5 +22,5 @@ services:
     ports:
       - 8000:80
 
-volumes:
-  mysql_data:
+# volumes:
+#   mysql_data:
