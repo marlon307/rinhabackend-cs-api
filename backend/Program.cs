@@ -1,54 +1,33 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PizzaStore API", Description = "Making the Pizzas you love", Version = "v1" });
+});
+
 var app = builder.Build();
 
-app.MapGet("/todoitems", async (TodoDb db) =>
-    await db.Todos.ToListAsync());
-
-app.MapGet("/todoitems/complete", async (TodoDb db) =>
-    await db.Todos.Where(t => t.IsComplete).ToListAsync());
-
-app.MapGet("/todoitems/{id}", async (int id, TodoDb db) =>
-    await db.Todos.FindAsync(id)
-        is Todo todo
-            ? Results.Ok(todo)
-            : Results.NotFound());
-
-app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    db.Todos.Add(todo);
-    await db.SaveChangesAsync();
-
-    return Results.Created($"/todoitems/{todo.Id}", todo);
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo API V1");
 });
 
-app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) =>
-{
-    var todo = await db.Todos.FindAsync(id);
+var todoItems = app.MapGroup("/todoitems");
+CTodo cTodo = new CTodo();
 
-    if (todo is null) return Results.NotFound();
-
-    todo.Name = inputTodo.Name;
-    todo.IsComplete = inputTodo.IsComplete;
-
-    await db.SaveChangesAsync();
-
-    return Results.NoContent();
-});
-
-app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
-{
-    if (await db.Todos.FindAsync(id) is Todo todo)
-    {
-        db.Todos.Remove(todo);
-        await db.SaveChangesAsync();
-        return Results.NoContent();
-    }
-
-    return Results.NotFound();
-});
+todoItems.MapGet("/", cTodo.GetAllTodos);
+todoItems.MapGet("/complete", cTodo.GetCompleteTodos);
+todoItems.MapGet("/{id}", cTodo.GetTodo);
+todoItems.MapPost("/", cTodo.CreateTodo);
+todoItems.MapPut("/{id}", cTodo.UpdateTodo);
+todoItems.MapDelete("/{id}", cTodo.DeleteTodo);
 
 app.Run();

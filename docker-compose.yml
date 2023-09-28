@@ -14,13 +14,23 @@ services:
       # - mysql_data:/var/lib/mysql
     ports:
       - "3036:3306"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: '1.5GB'
 
   backend:
     build: ./backend
     depends_on:
       - db
     ports:
-      - 8000:80
+      - 5000:80
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: '0.5GB'
 
 # volumes:
 #   mysql_data:

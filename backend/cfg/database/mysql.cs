@@ -1,6 +1,6 @@
 using MySql.Data.MySqlClient;
 
-public class MySqlExec
+class MySqlExec
 {
     private static MySqlConnection Connection()
     {
@@ -8,7 +8,6 @@ public class MySqlExec
         MySqlConnection cnn = new MySqlConnection(strConnection);
         return cnn;
     }
-
     public class MySqlParams
     {
         private string Param { get; set; }
@@ -19,14 +18,13 @@ public class MySqlExec
             Value = value;
         }
     }
-
     public static void ExecQuery(string query)
     {
         Connection().Open();
         MySqlCommand command = new MySqlCommand
         {
             Connection = Connection(),
-            CommandText = query
+            CommandText = query,
         };
         command.ExecuteNonQuery();
         MySqlDataReader reader = command.ExecuteReader();
